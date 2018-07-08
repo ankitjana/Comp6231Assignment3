@@ -2,6 +2,8 @@ package server.factories;
 
 import java.util.logging.Logger;
 
+import javax.xml.ws.Endpoint;
+
 import server.ConcreteDcmsServer;
 import server.ServerManifest;
 import server.constants.SeedData;
@@ -18,7 +20,7 @@ import server.storage.InMemoryDcmsDatabase;
 
 public class ServerFactory {
 
-	public static ConcreteDcmsServer createServer(String serverId, Logger logger, boolean seedData) throws Exception {
+	public static ConcreteDcmsServer createServer(int portNumber, String serverId, Logger logger, boolean seedData) throws Exception {
 		ServerManifest  serverManifest = new ServerManifest();
 		DcmsDatabase database = new InMemoryDcmsDatabase(serverId);
 		InsertRecordWorkflow createRecordWorkflow = new InsertRecordWorkflow(database, logger);
@@ -28,7 +30,7 @@ public class ServerFactory {
 		UdpServer recordCountServer = new UdpServer(logger, database);
 		UdpClient recordCountServerProxy = new UdpClient(logger, serverManifest, serverId);
 		RecordCountTaskFactory countRecordsWorkflow = new RecordCountTaskFactory(recordCountServerProxy, database, serverManifest, serverId, logger);
-		
+
 		ConcreteDcmsServer server = new ConcreteDcmsServer(
 				database, 
 				createRecordWorkflow, 
@@ -36,7 +38,17 @@ public class ServerFactory {
 				editFieldWorkflow, 
 				transferRecordWorkflow,
 				recordCountServer,
+				serverId,
 				logger);
+		
+		String serverUrl = String.format("http://localhost:%d/server", portNumber);
+		logger.info("Publishing server at " + serverUrl);
+		Endpoint e = Endpoint.publish(serverUrl, server);
+		
+		if(!e.isPublished()){
+			System.out.println("Server failed to publish");
+			System.exit(1);
+		}
 		
 		if(seedData) {
 			seedData(database, serverId);

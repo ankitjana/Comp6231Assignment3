@@ -32,10 +32,12 @@ public class ConcreteDcmsServer implements DcmsServer {
 	private EditFieldWorkflow editFieldWorkflow;
 	private UdpServerInfo udpServerInfo;
 	private TransferRecordWorkflow transferRecordWorkflow;
+	private String serverId;
 
 	public ConcreteDcmsServer(DcmsDatabase database, InsertRecordWorkflow creationWorkflow,
 			RecordCountTaskFactory countRecordsTaskFactory, EditFieldWorkflow editFieldWorkflow,
-			TransferRecordWorkflow transferRecordWorkflow, UdpServerInfo udpServerInfo, Logger logger) {
+			TransferRecordWorkflow transferRecordWorkflow, UdpServerInfo udpServerInfo, String serverId, 
+			Logger logger) {
 
 		this.database = database;
 		this.creationWorkflow = creationWorkflow;
@@ -43,6 +45,7 @@ public class ConcreteDcmsServer implements DcmsServer {
 		this.editFieldWorkflow = editFieldWorkflow;
 		this.transferRecordWorkflow = transferRecordWorkflow;
 		this.udpServerInfo = udpServerInfo;
+		this.serverId = serverId;
 		this.logger = logger;
 	}
 
@@ -312,7 +315,15 @@ public class ConcreteDcmsServer implements DcmsServer {
 		return udpServerInfo.getPort(); 
 	}
 	
-	
+	/**
+	 * Fetches the server id assigned to the server (such as MTL)
+	 * @return Server id
+	 */
+	@Override
+	public String getServerId() {
+		return serverId;
+	}
+
 	private <T extends BaseRecord> List<T> getRecordsInternal(Class<T> type, Character lastNameFiler, String clientId) {
 		try {
 			logger.info(String.format("%s: Retrieving %s records", clientId, type.getSimpleName()));

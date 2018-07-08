@@ -2,6 +2,10 @@ package server;
 
 import java.util.List;
 
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.jws.soap.SOAPBinding.Style;
+
 import server.models.BaseRecord;
 import server.models.CourseType;
 import server.models.RecordCount;
@@ -9,6 +13,8 @@ import server.models.StudentRecord;
 import server.models.StudentStatus;
 import server.models.TeacherRecord;
 
+@WebService
+@SOAPBinding(style=Style.RPC)
 public interface DcmsServer {
 
 	/**
@@ -155,5 +161,11 @@ public interface DcmsServer {
 	 * @return UDP port used by the server
 	 */
 	int getUdpServerPort();
+	
+	/**
+	 * Fetches the server id assigned to the server (such as MTL)
+	 * @return Server id
+	 */
+	String getServerId();
 	
 }

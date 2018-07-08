@@ -14,16 +14,22 @@ public class ServerMain {
 	
 	public static void main(String[] args) throws Exception {
 		
-		if(args.length != 1) {
-			System.out.println("The server must be supplied with an alphanumeric identifier (such as MTL, LVL, DDO):");
+		if(args.length != 2) {
+			System.out.println("Usage: server.jar <serverId> <port>");
+			System.out.println("Example: server.jar MTL 8080");
 			System.exit(1);	
 		}
 		
-		// TODO: server id input
-		String serverId = "MTL";
+		String serverId = args[0].replaceAll(InvalidServerIdRegex, "").toUpperCase();
 		
-		String T = args[0].replaceAll(InvalidServerIdRegex, "").toUpperCase();
-				
+		int serverPort = 0;
+		try{
+			serverPort = Integer.parseInt(args[1].trim());	
+		}catch (Exception e) {
+			System.out.println("Could not parse port number.");
+			System.exit(1);
+		}
+		
 		if(serverId.isEmpty()) {
 			System.out.println("Server identifier must be of alphannumeric characters only. All other characters will be removed.");
 			System.exit(1);	
@@ -31,10 +37,9 @@ public class ServerMain {
 		
 		Logger logger = LoggerFactory.createLogger("serverLogs", serverId);
 		logger.info(String.format("Server %s starting...", serverId));
-		
 	
 		// Create the server
-		ConcreteDcmsServer server = ServerFactory.createServer(serverId, logger, true);
+		ConcreteDcmsServer server = ServerFactory.createServer(serverPort, serverId, logger, true);
 	}
 	
 }
